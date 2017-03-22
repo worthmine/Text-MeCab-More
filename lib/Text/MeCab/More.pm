@@ -1,5 +1,5 @@
 package Text::MeCab::More;
-$VERSION = 0.04;
+$VERSION = 0.02;
 
 use strict;
 use warnings;
