@@ -37,7 +37,7 @@ subtest 'サ変動詞' => sub {                                                #
     }
 };
 
-subtest '接頭辞/接尾辞' => sub {                                                #3
+subtest '接頭辞/接尾辞' => sub {                                           #3
     plan tests => 5;
 
     my @parsed = $mecab->parse('フランス帰り 第二回 第一部 お中元 ご両親');

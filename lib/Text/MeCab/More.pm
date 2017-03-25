@@ -27,7 +27,7 @@ sub parse {
     for ( my $node = $self->SUPER::parse($text); $node; $node = $node->next ){
         next if $node->stat =~ /[23]/; # skip MECAB_(BOS|EOS)_NODE
         my @features = split ',', decode_utf8($node->feature);
-        next if $features[0] =~ /^(:?記号|補助記号)$/;
+        next if $features[0] =~ /^(:?記号|補助記号|フィラー)$/;
         push @parsed, {
             surface => decode_utf8($node->surface),
             feature => \@features,
@@ -116,6 +116,7 @@ sub parse {
     foreach my $node (@parsed) { # 一旦連結しないと定義できない。
         $node->{pos}      ||= $node->{feature}[0];
         $node->{baseform} ||= $node->{feature}[6];
+        $node->{reading}  ||= $node->{feature}[7];
     }
 
     return wantarray? @parsed: \@parsed;
@@ -134,7 +135,7 @@ sub join_verb {
     if( $next_feature[0] !~ /^(:?名詞)$/ or $next_feature[1] eq '接尾' or $next_feature[6] =~/(:?すぎる|過ぎる)/ ){
         $node->{pos} = '動詞';
         $node->{feature} = [ '動詞', '自立', '連用接続',
-            @next_feature[ 3, 4, 5 ],
+            @next_feature[ 3..5 ],
             $node->{surface}    . $next_feature[6],
             $node->{feature}[7] . $next_feature[7],
             $node->{feature}[8] . $next_feature[8],
