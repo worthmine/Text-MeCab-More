@@ -47,21 +47,11 @@ sub parse {
         next unless $node->{feature}[0] =~ /^(:?名詞|接頭詞|動詞|形容詞|助動詞)$/;
         my $next = $node->{next};
         my @next_feature = split ',', decode_utf8($next->feature);
-        if( $node->{feature}[0] eq '接頭詞' and $next_feature[0] eq '名詞' and $next_feature[1] !~ /^(:?代名詞|固有名詞)$/ ) {
+        if( $node->{feature}[0] eq '接頭詞' and $next_feature[0] eq '名詞' ) {
             $node = $self->join_prefix( $node, \@parsed, $i );
         }elsif( $node->{feature}[0] eq '名詞' ) {
-            if( $node->{feature}[1] eq '形容動詞語幹' and decode_utf8($next->surface) =~ /^(だろ|だっ|で|に|だ|な|なら)$/ ) {
-                $node->{pos} = '形容動詞';
-                $node->{feature} = [ '形容動詞', '*', '*', '*', '*',
-                    $活用形{$&},
-                    $node->{feature}[6] . $next_feature[6],
-                    $node->{feature}[7] . $next_feature[7],
-                    $node->{feature}[8] . $next_feature[8],
-                ];
-                $node->{cost} += $next->cost;
-                $node->{surface} .= decode_utf8 $next->surface;
-                splice @parsed, $i, 1;
-                $node->{next} = $next->next;
+            if( $node->{feature}[1] eq '形容動詞語幹' ) {
+                $node = $self->make_adjectival_noun( $node, \@parsed, $i );
             }elsif( $node->{feature}[1] eq '副詞可能' ) {
                 carp "副詞可能名詞の検出: $next_feature[0] at $i";
 =cut
@@ -154,6 +144,28 @@ sub join_verb {
     return $node;
 }
 
+sub make_adjectival_noun {
+    my $self = shift;
+    my $node = shift;
+    my $parsed = shift;
+    my $i = shift;
+    my $next = $node->{next};
+    return $node if decode_utf8($next->surface) !~ /^(だろ|だっ|で|に|だ|な|なら)$/;
+    my @next_feature = split ',', decode_utf8($next->feature);
+    $node->{pos} = '形容動詞';
+    $node->{feature} = [ '形容動詞', '*', '*', '*', '*',
+        $活用形{$&},
+        $node->{feature}[6] . $next_feature[6],
+        $node->{feature}[7] . $next_feature[7],
+        $node->{feature}[8] . $next_feature[8],
+    ];
+    $node->{cost} += $next->cost;
+    $node->{surface} .= decode_utf8($next->surface);
+    splice $parsed, $i, 1;
+    $node->{next} = $next->next;
+    return $node;
+}
+
 sub join_noun {
     my $self = shift;
     my $node = shift;
@@ -162,6 +174,9 @@ sub join_noun {
     my $next = $node->{next};
     my @next_feature = split ',', decode_utf8($next->feature);
     return $node if $next_feature[0] ne '名詞';
+    return $node if $next_feature[1] =~ /^(:?代名詞|固有名詞)$/;
+
+    #return $node if $next_feature[2] eq '形容動詞語幹'
     $node->{feature} = [ '名詞',
         $node->{feature}[1] eq '*'? $next_feature[1] : $node->{feature}[1],
         $node->{feature}[2] eq '*'? $next_feature[2] : $node->{feature}[2],
@@ -176,7 +191,9 @@ sub join_noun {
     splice $parsed, $i, 1;
     $node->{next} = $next->next;
     my @next_next = split ',', decode_utf8($next->feature);
-    if( $next_next[0] eq '名詞' and $next_next[1] !~ /^(:?代名詞|固有名詞)$/  ) {
+    if( $node->{feature}[2] eq '形容動詞語幹' ){
+        $node = $self->make_adjectival_noun( $node, $parsed, $i );
+    }elsif( $next_next[0] eq '名詞' ) {
         $node = $self->join_noun( $node, $parsed, $i );
     }
     return $node;
@@ -189,6 +206,8 @@ sub join_prefix {
     my $i = shift;
     my $next = $node->{next};
     my @next_feature = split ',', decode_utf8($next->feature);
+    return $node if $next_feature[0] ne '名詞';
+    return $node if $next_feature[1] =~ /^(:?代名詞|固有名詞)$/;
     $node->{pos} = '名詞';
     $node->{cost} = $next->cost;
     $node->{feature} = [
