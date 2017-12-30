@@ -1,5 +1,5 @@
 name = "Text-MeCab-More"
-# badges = ["travis"]
+badges = ["travis"]
 authority="cpan:WORTHMINE"
 
 module_maker="ModuleBuildTiny"
