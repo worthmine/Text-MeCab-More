@@ -4,7 +4,8 @@ use warnings;
 use Encode;
 use Test::More tests => 9;
 use lib 'lib/';
-BEGIN { use_ok 'Text::MeCab::More' }                                    # 1
+
+use_ok 'Text::MeCab::More';                                             # 1
 
 my $mecab = new_ok('Text::MeCab::More');                                # 2
 
