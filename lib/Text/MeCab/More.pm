@@ -180,7 +180,7 @@ sub _make_doing { # サ変動詞を作る
     ];
     $node->{cost} += $next->cost;
     $node->{surface} .= decode_utf8($next->surface);
-    splice $parsed, $i, 1;
+    splice @$parsed, $i, 1;
     $node->{next} = $next->next;
     return $node;
 }
@@ -202,7 +202,7 @@ sub _make_adjectival_noun { # 形容動詞を作る
     ];
     $node->{cost} += $next->cost;
     $node->{surface} .= decode_utf8($next->surface);
-    splice $parsed, $i, 1;
+    splice @$parsed, $i, 1;
     $node->{next} = $next->next;
     return $node;
 }
@@ -228,7 +228,7 @@ sub _join_noun { # 連続した名詞をくっつける
             $node->{feature}[8] . $next_feature[8],
         ];
         $node->{surface} .= decode_utf8($next->surface);
-        splice $parsed, $i, 1;
+        splice @$parsed, $i, 1;
         $node->{next} = $next->next;
     }
 
@@ -261,7 +261,7 @@ sub _join_prefix {  # 接頭詞を後ろの名詞にくっつける
         $node->{feature}[8] . $next_feature[8],
     ];
     $node->{surface} .= decode_utf8($next->surface);
-    splice $parsed, $i, 1;
+    splice @$parsed, $i, 1;
     $node->{next} = $next->next;
     my @next_next = split ',', decode_utf8($next->feature);
     if( $next_next[0] eq '名詞' and $next_next[1] !~ /^(:?代名詞|固有名詞)$/  ) {
