@@ -48,7 +48,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Text::Mecab" : "0"
+            "Text::MeCab" : "0"
          }
       }
    },
