@@ -25,7 +25,7 @@ subtest '形容動詞' => sub {                                                #
 subtest 'サ変動詞' => sub {                                                #2
     plan tests => 3;
 
-    my @parsed = $mecab->parse('失踪する 起動しない 納得せず');
+    my @parsed = $mecab->parse('失踪する。起動しない。納得せず。');
     my @text =qw( 失踪する 起動し 納得せ );
     my $i = 0;
     foreach my $node (@parsed) {
@@ -40,7 +40,7 @@ subtest 'サ変動詞' => sub {                                                #
 subtest '接頭辞/接尾辞' => sub {                                           #3
     plan tests => 5;
 
-    my @parsed = $mecab->parse('フランス帰り 第二回 第一部 お中元 ご両親');
+    my @parsed = $mecab->parse('フランス帰り、第二回、第一部、お中元、ご両親');
     my @text =qw( フランス帰り 第二回 第一部 お中元 ご両親 );
     my $i = 0;
     foreach my $node (@parsed) {

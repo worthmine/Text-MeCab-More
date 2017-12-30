@@ -10,7 +10,7 @@ my $mecab = Text::MeCab::More->new();
 subtest '動詞の連用接続' => sub {                                           #1
     plan tests => 3;
 
-    my @parsed = $mecab->parse('混み合う 賄いきれない 振り切れる');
+    my @parsed = $mecab->parse('混み合う。賄いきれない。振り切れる。');
     my @text =qw( 混み合う 賄いきれ 振り切れる );
     my $i = 0;
     foreach my $node (@parsed) {

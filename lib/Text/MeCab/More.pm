@@ -20,6 +20,33 @@ my %活用形 = (
     'なら'    => '仮定形',
 );
 
+=encoding utf-8
+
+=head1 NAME
+
+Text::MeCab::More - a parser for Japanese texts more strict
+
+=head1 SYNOPSIS
+
+ my $tmm = Text::MeCab::More;
+
+=head1 DESCRIPTION
+
+=head1 Constructor and initialization
+
+=head2 new()
+
+No arguments are required.
+
+=head1 Methods and Subroutines
+
+=head2 parse( $text )
+
+This is the core method of this module.
+I know I have to write the description for this method. but not yet.
+
+=cut
+
 sub parse {
     my $self = shift;
     my $text = shift;
@@ -48,12 +75,13 @@ sub parse {
         my $next = $node->{next};
         my @next_feature = split ',', decode_utf8($next->feature);
         if( $node->{feature}[0] eq '接頭詞' and $next_feature[0] eq '名詞' ) {
-            $node = $self->join_prefix( $node, \@parsed, $i );
+            $node = $self->_join_prefix( $node, \@parsed, $i );
         }elsif( $node->{feature}[0] eq '名詞' ) {
             if( $node->{feature}[1] eq '形容動詞語幹' and decode_utf8($next->surface) =~ /^(だろ|だっ|で|に|だ|な|なら)$/ ) {
-                $node = $self->make_adjectival_noun( $node, \@parsed, $i );
+                $node = $self->_make_adjectival_noun( $node, \@parsed, $i );
             }elsif( $node->{feature}[1] eq '副詞可能' ) {
                 carp "副詞可能名詞の検出: $next_feature[0] at $i";
+
 =cut
                 #なんとかならんか検討中
                 $node->{pos} = '副詞';
@@ -64,31 +92,31 @@ sub parse {
                 ];
                 $node->{cost} += $next->cost;
 =cut
+                
             }elsif( $node->{feature}[1] =~ /^サ変/ ) {
                 if( $next_feature[0] eq '動詞' and $next_feature[4] =~ /^サ変/ ) {
-                    $node = $self->make_doing( $node, \@parsed, $i );
+                    $node = $self->_make_doing( $node, \@parsed, $i );
                 }
             }elsif( $next_feature[0] eq '名詞' and $next_feature[1] eq '接尾' ){
-                warn encode_utf8($next_feature[1].$node->{surface} );
-                $node = $self->join_noun( $node, \@parsed, $i );
+                $node = $self->_join_noun( $node, \@parsed, $i );
             }elsif( $next_feature[0] eq '名詞' and $next_feature[2] =~ /^(:?サ変|形容動詞語幹)/ ) {
-                $node = $self->join_noun( $node, \@parsed, $i );
+                $node = $self->_join_noun( $node, \@parsed, $i );
             }
         }elsif( $node->{feature}[0] eq '動詞' ) {
             if( $node->{feature}[5] =~ /^連用/ and $next_feature[0] eq '動詞' ) {
-                $node = $self->join_verb( $node, \@parsed, $i );
+                $node = $self->_join_verb( $node, \@parsed, $i );
             }
         }elsif( $node->{feature}[0] eq '助動詞' ) {
             if( $node->{feature}[5] =~ /^連用/ and $next_feature[0] eq '動詞' ) {
-                $node = $self->join_verb( $node, \@parsed, $i );
+                $node = $self->_join_verb( $node, \@parsed, $i );
             }
         }elsif( $node->{feature}[0] eq '形容詞' ) {
             if( $node->{feature}[5] =~ /^連用/ and $next_feature[0] =~ /^(:?助動詞|動詞)$/ ) {
-                $node = $self->join_verb( $node, \@parsed, $i );
+                $node = $self->_join_verb( $node, \@parsed, $i );
             }elsif( $node->{feature}[5] eq 'ガル接続' and $next_feature[0] eq '動詞' ) {
-                $node = $self->join_verb( $node, \@parsed, $i );
+                $node = $self->_join_verb( $node, \@parsed, $i );
             }elsif( $node->{feature}[5] eq 'ガル接続' and $next_feature[6] eq 'さ' ) {
-                $node = $self->join_verb( $node, \@parsed, $i );
+                $node = $self->_join_verb( $node, \@parsed, $i );
             }
         }
     }
@@ -102,7 +130,7 @@ sub parse {
     return wantarray? @parsed: \@parsed;
 }
 
-sub join_verb {
+sub _join_verb {    # 連用形の動詞をくっつける
     my $self = shift;
     my $node = shift;
     my $parsed = shift;
@@ -127,14 +155,14 @@ sub join_verb {
     }
     my @next_next = split ',', decode_utf8($node->{next}->feature);
     if( $node->{feature}[5] =~ /^連用/ and $next_next[0] =~ /^(:?動詞|助動詞)$/  ) {
-        $node = $self->join_verb( $node, $parsed, $i );
+        $node = $self->_join_verb( $node, $parsed, $i );
     }elsif( $node->{feature}[6] eq 'なさ' and $next_next[0] =~ /^(:?動詞|助動詞)$/  ) {
-        $node = $self->join_verb( $node, $parsed, $i );
+        $node = $self->_join_verb( $node, $parsed, $i );
     }
     return $node;
 }
 
-sub make_doing {
+sub _make_doing { # サ変動詞を作る
     my $self = shift;
     my $node = shift;
     my $parsed = shift;
@@ -157,7 +185,7 @@ sub make_doing {
     return $node;
 }
 
-sub make_adjectival_noun {
+sub _make_adjectival_noun { # 形容動詞を作る
     my $self = shift;
     my $node = shift;
     my $parsed = shift;
@@ -179,7 +207,7 @@ sub make_adjectival_noun {
     return $node;
 }
 
-sub join_noun {
+sub _join_noun { # 連続した名詞をくっつける
     my $self = shift;
     my $node = shift;
     my $parsed = shift;
@@ -188,7 +216,6 @@ sub join_noun {
     my @next_feature = split ',', decode_utf8($next->feature);
     return $node if $next_feature[0] !~ /(:?名詞|動詞)/;
     return $node if $next_feature[1] =~ /^(:?代名詞|固有名詞)$/;
-    warn "debug: " . $next_feature[1] . $next_feature[0] . $node->{surface};
     if( $next_feature[0] eq '名詞' ){
         $node->{feature} = [ '名詞',
             $node->{feature}[1] eq '*'? $next_feature[1] : $node->{feature}[1],
@@ -207,16 +234,16 @@ sub join_noun {
 
     my @next_next = split ',', decode_utf8($next->feature);
     if( $node->{feature}[2] eq '形容動詞語幹' ){
-        $node = $self->make_adjectival_noun( $node, $parsed, $i );
+        $node = $self->_make_adjectival_noun( $node, $parsed, $i );
     }elsif( $next_next[0] eq '名詞' ) {
-        $node = $self->join_noun( $node, $parsed, $i );
+        $node = $self->_join_noun( $node, $parsed, $i );
     }elsif( $next_next[0] eq '動詞' and $node->{feature}[2] =~ /^サ変/ and $next_next[4] eq 'サ変・スル' ) {
-        $node = $self->make_doing( $node, $parsed, $i );
+        $node = $self->_make_doing( $node, $parsed, $i );
     }
     return $node;
 }
 
-sub join_prefix {
+sub _join_prefix {  # 接頭詞を後ろの名詞にくっつける
     my $self = shift;
     my $node = shift;
     my $parsed = shift;
@@ -238,9 +265,30 @@ sub join_prefix {
     $node->{next} = $next->next;
     my @next_next = split ',', decode_utf8($next->feature);
     if( $next_next[0] eq '名詞' and $next_next[1] !~ /^(:?代名詞|固有名詞)$/  ) {
-        $node = $self->join_noun( $node, $parsed, $i );
+        $node = $self->_join_noun( $node, $parsed, $i );
     }
     return $node;
 }
 
 1;
+
+__END__
+
+=head1 SEE ALSO
+
+=over
+
+=item L<GitHub|https://github.com/worthmine/Text-MeCab-More>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Yuki Yoshida(worthmine).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Yuki Yoshida(worthmine) E<lt>worthmine!at!gmail.comE<gt>
