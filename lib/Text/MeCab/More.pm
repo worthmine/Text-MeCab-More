@@ -150,7 +150,7 @@ sub _join_verb {    # 連用形の動詞をくっつける
         ];
         $node->{surface} .= decode_utf8($next->surface);
         $node->{cost} += $next->cost;
-        splice $parsed, $i, 1;
+        splice @$parsed, $i, 1;
         $node->{next} = $next->next;
     }
     my @next_next = split ',', decode_utf8($node->{next}->feature);

@@ -3,6 +3,7 @@ use warnings;
 
 use Encode;
 use Test::More tests => 4;
+
 use lib 'lib/';
 use Text::MeCab::More;
 my $mecab = Text::MeCab::More->new();
