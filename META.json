@@ -45,6 +45,11 @@
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::Mecab" : "0"
+         }
       }
    },
    "release_status" : "unstable",
