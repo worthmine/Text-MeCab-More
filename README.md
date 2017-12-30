@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/worthmine/Text-MeCab-More.svg?branch=master)](https://travis-ci.org/worthmine/Text-MeCab-More)
 # NAME
 
 Text::MeCab::More - a parser for Japanese texts more strict
