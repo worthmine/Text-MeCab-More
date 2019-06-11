@@ -15,10 +15,8 @@ perl:
 
 before_install:
 - 'sudo apt-get install mecab libmecab-dev mecab-ipadic mecab-ipadic-utf8'
-#- 'sudo apt install mecab'
-#- 'sudo apt install libmecab-dev'
-#- 'sudo apt install mecab-ipadic-utf8'
 
 nstallnotificatione:
-  slack:
+    email: false
+    slack:
     secure: Lxf+Ne0msvZbSqB65ZLOqO68qgaziG79nSib0vqPkwN9hoQR2FncJ0AlNHyZuA2PqotcPrVP6/bBabUjrXgn016TSp5HersKaMbRLKSb2PSQfcZQIAtTXiAnNGfPhwd2hT4hF9GOZWcjlflVwnqDUeZPUh/FRzd/eztlV5H0ukrML37wcAqy3uhuDNeMcIV7YpCL/jgd+zrI/TQ+Y6PFDLtVNPh89xp5x2A8GUByxHiXb2YtrASLaZnvW+KqQh98t48uHMa6w7DItXJHrekWariUq8mbbCK4cC9iYV+rmXoPmzjKH7mt70wYyvVaXpgoCTaAdYAErU1Koob76/8cF6EmG1rRyvLj1Wz5JXaagPdgpMtNzzB9Wty9TaiKxb9Ok+IcL64QbSfaZ0HFufudVqXz6TaubdWmgH7rC9V9hoil5tiZrj4k2dIVWSYljOaD/W3vrNUnYJHJKqX+kECIE/GcETEE8sjYi25CgkJqV1IhH8B5Vcykbn1LGQQtoZ4JC3baGtp8A0joVSaIavstl5s9iA4o5w0Y2tV6xicnB6eYwFZkw+6ZXelZ9U8uGLtWFbaYaV3VUEKs6fIEIKxJT3Hht86vo5NOoml1TaSps8q4Mjake1fe3UIQCDqdjuTeoy26bfyzH34h+ggwH59BL+R0o8WL/gNQ7x05103cIOM=
