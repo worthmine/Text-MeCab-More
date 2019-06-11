@@ -14,9 +14,10 @@ perl:
 - '5.26'
 
 before_install:
-- 'sudo apt install mecab'
-- 'sudo apt install libmecab-dev'
-- 'sudo apt install mecab-ipadic-utf8'
+- 'sudo apt-get install mecab libmecab-dev mecab-ipadic mecab-ipadic-utf8'
+#- 'sudo apt install mecab'
+#- 'sudo apt install libmecab-dev'
+#- 'sudo apt install mecab-ipadic-utf8'
 
 nstallnotificatione:
   slack:
