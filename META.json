@@ -70,7 +70,7 @@
          "web" : "https://github.com/worthmine/Text-MeCab-More"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "Yuki Yoshida <worthmine@gmail.com>",
